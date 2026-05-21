@@ -1,7 +1,7 @@
 const UserDAO = require("./user-dao").UserDAO;
 
 /* The AllocationsDAO must be constructed with a connected database object */
-const AllocationsDAO = function(db){
+const AllocationsDAO = function (db) {
 
     "use strict";
 
@@ -75,7 +75,8 @@ const AllocationsDAO = function(db){
                 throw `The user supplied threshold: ${parsedThreshold} was not valid.`;
                 */
                 return {
-                    $where: `this.userId == ${parsedUserId} && this.stocks > '${threshold}'`
+                    userId: parsedUserId,
+                    stocks: { $gt: threshold }
                 };
             }
             return {
@@ -90,7 +91,7 @@ const AllocationsDAO = function(db){
             let doneCounter = 0;
             const userAllocations = [];
 
-            allocations.forEach( alloc => {
+            allocations.forEach(alloc => {
                 userDAO.getUserById(alloc.userId, (err, user) => {
                     if (err) return callback(err, null);
 

@@ -7,6 +7,7 @@ const MemosHandler = require("./memos");
 const ResearchHandler = require("./research");
 const tutorialRouter = require("./tutorial");
 const ErrorHandler = require("./error").errorHandler;
+const rateLimit = require("express-rate-limit");
 
 const index = (app, db) => {
 
@@ -29,9 +30,14 @@ const index = (app, db) => {
     // The main page of the app
     app.get("/", sessionHandler.displayWelcomePage);
 
+    const loginLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 20
+    });
+
     // Login form
     app.get("/login", sessionHandler.displayLoginPage);
-    app.post("/login", sessionHandler.handleLoginRequest);
+    app.post("/login", loginLimiter, sessionHandler.handleLoginRequest);
 
     // Signup form
     app.get("/signup", sessionHandler.displaySignupPage);
@@ -69,7 +75,14 @@ const index = (app, db) => {
     // Handle redirect for learning resources link
     app.get("/learn", isLoggedIn, (req, res) => {
         // Insecure way to handle redirects by taking redirect url from query string
-        return res.redirect(req.query.url);
+        const allowedRedirects = {
+            learn: "/learn",
+            profile: "/profile",
+            dashboard: "/dashboard"
+        };
+
+        const redirectTarget = allowedRedirects[req.query.url] || "/";
+        return res.redirect(redirectTarget);
     });
 
     // Research Page
