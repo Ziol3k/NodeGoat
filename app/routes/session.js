@@ -25,7 +25,7 @@ function SessionHandler(db) {
     this.isAdminUserMiddleware = (req, res, next) => {
         if (req.session.userId) {
             return userDAO.getUserById(req.session.userId, (err, user) => {
-               return user && user.isAdmin ? next() : res.redirect("/login");
+                return user && user.isAdmin ? next() : res.redirect("/login");
             });
         }
         console.log("redirecting to login");
@@ -140,7 +140,7 @@ function SessionHandler(db) {
         const USER_RE = /^.{1,20}$/;
         const FNAME_RE = /^.{1,100}$/;
         const LNAME_RE = /^.{1,100}$/;
-        const EMAIL_RE = /^[\S]+@[\S]+\.[\S]+$/;
+        const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,24}$/;
         const PASS_RE = /^.{1,20}$/;
         /*
         //Fix for A2-2 - Broken Authentication -  requires stronger password
@@ -178,6 +178,10 @@ function SessionHandler(db) {
             return false;
         }
         if (email !== "") {
+            if (typeof email !== "string" || email.length > 254) {
+                errors.emailError = "Invalid email address";
+                return false;
+            }
             if (!EMAIL_RE.test(email)) {
                 errors.emailError = "Invalid email address";
                 return false;

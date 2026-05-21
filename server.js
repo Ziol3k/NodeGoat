@@ -74,6 +74,8 @@ MongoClient.connect(db, (err, db) => {
         extended: false
     }));
 
+    app.use(csrf({ cookie: false }));
+
     // Enable session management using express middleware
     app.use(session({
         // genid: (req) => {
@@ -97,7 +99,7 @@ MongoClient.connect(db, (err, db) => {
 
     }));
 
-    app.use(csrf({ cookie: false }));
+
 
     /*
     // Fix for A8 - CSRF
